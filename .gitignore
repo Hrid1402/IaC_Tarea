@@ -1,2 +1,14 @@
-.terraform
-terraform.tfvars
+# Terraform
+infra/.terraform/
+infra/terraform.tfvars
+infra/*.tfstate
+infra/*.tfstate.*
+infra/.terraform.lock.hcl
+
+# Dependencias y empaquetados
+infra/node_modules/
+infra/**/*.zip
+
+# Archivos temporales de pruebas locales
+infra/response.json
+infra/payload.json
