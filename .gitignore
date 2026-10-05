@@ -12,3 +12,6 @@ infra/**/*.zip
 # Archivos temporales de pruebas locales
 infra/response.json
 infra/payload.json
+
+# Dependencias
+infra/node_modules/
