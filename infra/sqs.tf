@@ -1,13 +1,13 @@
 resource "aws_sqs_queue" "dlq_queue" {
-  name                      = "image-processor-env-image-dlq"
+  name                      = "${local.name_prefix}-images-dlq"
   message_retention_seconds = 1209600
   tags = {
-    Environment = "dev"
+    Environment = local.environment
   }
 }
 
 resource "aws_sqs_queue" "main_queue" {
-  name                       = "image-processor-env-image-queue"
+  name                       = "${local.name_prefix}-images-queue"
   visibility_timeout_seconds = 360
   message_retention_seconds  = 86400
   receive_wait_time_seconds  = 20
@@ -17,6 +17,6 @@ resource "aws_sqs_queue" "main_queue" {
   })
 
   tags = {
-    Environment = "dev"
+    Environment = local.environment
   }
 }

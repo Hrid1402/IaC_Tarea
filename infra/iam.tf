@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "upload-lambda" {
 }
 
 resource "aws_iam_policy" "upload-lambda-s3-policy" {
-  name   = "upload-lambda-s3-policy"
+  name   = "${local.name_prefix}-upload-lambda-s3-policy"
   policy = data.aws_iam_policy_document.upload-lambda.json
 }
 
@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "upload-lambda-role" {
 }
 
 resource "aws_iam_role" "upload-lambda-role" {
-  name               = "upload-lambda-role"
+  name               = "${local.name_prefix}-upload-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.upload-lambda-role.json
 }
 
@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "crop-lambda" {
 }
 
 resource "aws_iam_policy" "crop-lambda-s3-policy" {
-  name   = "crop-lambda-s3-policy"
+  name   = "${local.name_prefix}-crop-lambda-s3-policy"
   policy = data.aws_iam_policy_document.crop-lambda.json
 }
 
@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "crop-lambda-role" {
 }
 
 resource "aws_iam_role" "crop-lambda-role" {
-  name               = "crop-lambda-role"
+  name               = "${local.name_prefix}-crop-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.crop-lambda-role.json
 }
 
