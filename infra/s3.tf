@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "image_bucket" {
-  bucket = "image-processor-env-images-suffix-37XlWGsSwL"
+  // Nombre del bucket S3 en minúsculas porque nombres de los buckets de S3 en AWS no pueden contener letras mayúsculas
+  bucket = "image-processor-env-images-suffix-37xlwgsswl"
 
   tags = {
     Name        = "Image Processor Bucket"
