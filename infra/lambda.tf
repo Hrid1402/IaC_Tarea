@@ -35,7 +35,7 @@ data "archive_file" "upload_zip" {
 resource "aws_lambda_function" "upload_lambda" {
   filename      = data.archive_file.upload_zip.output_path
   function_name = "${local.name_prefix}-upload-lambda"
-  role          = aws_iam_role.lambda_exec.arn
+  role          = aws_iam_role.upload-lambda-role.arn
   handler       = "index.handler"
   code_sha256   = data.archive_file.upload_zip.output_base64sha256
   runtime       = "nodejs20.x"
@@ -47,13 +47,24 @@ resource "aws_lambda_function" "upload_lambda" {
       UPLOAD_PREFIX = "uploads/"
     }
   }
+
+  vpc_config {
+    subnet_ids = [
+      aws_subnet.private_a.id,
+      aws_subnet.private_b.id
+    ]
+
+    security_group_ids = [
+      aws_security_group.lambda.id
+    ]
+  }
 }
 
 # Función de procesamiento Lambda (Crop)
 resource "aws_lambda_function" "crop_lambda" {
   filename      = data.archive_file.crop_zip.output_path
   function_name = "${local.name_prefix}-crop-lambda"
-  role          = aws_iam_role.lambda_exec.arn
+  role          = aws_iam_role.crop-lambda-role.arn
   handler       = "crop.handler"
   code_sha256   = data.archive_file.crop_zip.output_base64sha256
   runtime       = "nodejs20.x"
@@ -64,6 +75,17 @@ resource "aws_lambda_function" "crop_lambda" {
       S3_BUCKET        = aws_s3_bucket.image_bucket.id
       PROCESSED_PREFIX = "processed/"
     }
+  }
+
+  vpc_config {
+    subnet_ids = [
+      aws_subnet.private_a.id,
+      aws_subnet.private_b.id
+    ]
+
+    security_group_ids = [
+      aws_security_group.lambda.id
+    ]
   }
 }
 
