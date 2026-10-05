@@ -3,7 +3,7 @@ data "aws_iam_policy_document" "upload-lambda" {
   statement {
     actions = ["s3:PutObject"]
 
-    resources = ["arn:aws:s3:::*"]
+    resources = ["${aws_s3_bucket.image_bucket.arn}/uploads/*"]
   }
 }
 
@@ -50,15 +50,25 @@ resource "aws_iam_role_policy_attachment" "upload_vpc_access" {
 data "aws_iam_policy_document" "crop-lambda" {
   statement {
     actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-      "sqs:ReceiveMessage",
-      "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes",
-      "sqs:ChangeMessageVisibility"
+      "s3:GetObject"
     ]
 
-    resources = ["arn:aws:s3:::*"]
+    resources = ["${aws_s3_bucket.image_bucket.arn}/uploads/*"]
+  }
+  statement {
+    actions = ["s3:PutObject"]
+
+    resources = ["${aws_s3_bucket.image_bucket.arn}/processed/*"]
+  }
+
+  statement {
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes"
+    ]
+
+    resources = [aws_sqs_queue.main_queue.arn]
   }
 }
 

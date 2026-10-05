@@ -1,22 +1,3 @@
-# Rol IAM para ejecución de Lambda
-data "aws_iam_policy_document" "lambda_assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "lambda_exec" {
-  name               = "${local.name_prefix}-lambda-execution-role"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
 # Empaquetar el código de la función de procesamiento Lambda
 data "archive_file" "crop_zip" {
   type        = "zip"
@@ -87,16 +68,4 @@ resource "aws_lambda_function" "crop_lambda" {
       aws_security_group.lambda.id
     ]
   }
-}
-
-# Adjuntar la política básica de ejecución (permite escribir logs en CloudWatch)
-resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role       = aws_iam_role.lambda_exec.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
-# Adjuntar una política que permita acceso a S3 (para que pueda subir la imagen)
-resource "aws_iam_role_policy_attachment" "lambda_s3" {
-  role       = aws_iam_role.lambda_exec.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
