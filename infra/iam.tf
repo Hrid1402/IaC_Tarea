@@ -3,12 +3,12 @@ data "aws_iam_policy_document" "upload-lambda" {
   statement {
     actions = ["s3:PutObject"]
 
-    resources = ["arn:aws:s3:::*"]
+    resources = ["${aws_s3_bucket.image_bucket.arn}/uploads/*"]
   }
 }
 
 resource "aws_iam_policy" "upload-lambda-s3-policy" {
-  name   = "upload-lambda-s3-policy"
+  name   = "${local.name_prefix}-upload-lambda-s3-policy"
   policy = data.aws_iam_policy_document.upload-lambda.json
 }
 
@@ -26,7 +26,7 @@ data "aws_iam_policy_document" "upload-lambda-role" {
 }
 
 resource "aws_iam_role" "upload-lambda-role" {
-  name               = "upload-lambda-role"
+  name               = "${local.name_prefix}-upload-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.upload-lambda-role.json
 }
 
@@ -50,20 +50,30 @@ resource "aws_iam_role_policy_attachment" "upload_vpc_access" {
 data "aws_iam_policy_document" "crop-lambda" {
   statement {
     actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-      "sqs:ReceiveMessage",
-      "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes",
-      "sqs:ChangeMessageVisibility"
+      "s3:GetObject"
     ]
 
-    resources = ["arn:aws:s3:::*"]
+    resources = ["${aws_s3_bucket.image_bucket.arn}/uploads/*"]
+  }
+  statement {
+    actions = ["s3:PutObject"]
+
+    resources = ["${aws_s3_bucket.image_bucket.arn}/processed/*"]
+  }
+
+  statement {
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes"
+    ]
+
+    resources = [aws_sqs_queue.main_queue.arn]
   }
 }
 
 resource "aws_iam_policy" "crop-lambda-s3-policy" {
-  name   = "crop-lambda-s3-policy"
+  name   = "${local.name_prefix}-crop-lambda-s3-policy"
   policy = data.aws_iam_policy_document.crop-lambda.json
 }
 
@@ -81,7 +91,7 @@ data "aws_iam_policy_document" "crop-lambda-role" {
 }
 
 resource "aws_iam_role" "crop-lambda-role" {
-  name               = "crop-lambda-role"
+  name               = "${local.name_prefix}-crop-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.crop-lambda-role.json
 }
 
