@@ -14,4 +14,4 @@ infra/response.json
 infra/payload.json
 
 # Dependencias
-infra/node_modules/
+infra/lambda/node_modules/

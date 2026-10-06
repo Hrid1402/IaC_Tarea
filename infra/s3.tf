@@ -1,7 +1,6 @@
 resource "aws_s3_bucket" "image_bucket" {
-  // Nombre del bucket S3 en minúsculas porque nombres de los buckets de S3 en AWS no pueden contener letras mayúsculas
   bucket = "${local.name_prefix}-images-suffix-37xlwgsswl"
-
+  force_destroy = true
   tags = {
     Name        = "${local.name_prefix}-images"
     Environment = local.environment
@@ -60,4 +59,18 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
     }
     status = "Enabled"
   }
+}
+
+
+#Notification
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = aws_s3_bucket.image_bucket.id
+  
+  queue {
+    queue_arn     = aws_sqs_queue.main_queue.arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "uploads/"
+  }
+  
+  depends_on = [aws_sqs_queue_policy.s3_to_sqs]
 }

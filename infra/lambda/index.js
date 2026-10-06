@@ -9,10 +9,8 @@ exports.handler = async (event) => {
     try {
         const contentType = event.headers?.['content-type'] || event.headers?.['Content-Type'] || '';
 
-        // Importación dinámica de uuid para evitar errores de ESM / require()
         const { v4: uuidv4 } = await import('uuid');
 
-        // Opción A: Procesar por multipart/form-data usando busboy
         if (contentType.includes('multipart/form-data')) {
             const fileData = await parseMultipart(event);
             
@@ -39,7 +37,6 @@ exports.handler = async (event) => {
             };
         } 
         
-        // Opción B: Procesar por JSON con Base64
         else {
             const body = event.isBase64Encoded ? Buffer.from(event.body, 'base64') : Buffer.from(event.body, 'utf-8');
             let jsonPayload;
@@ -85,7 +82,6 @@ exports.handler = async (event) => {
     }
 };
 
-// Función auxiliar para parsear multipart con busboy en entorno Lambda (Payload 2.0)
 function parseMultipart(event) {
     return new Promise((resolve, reject) => {
         const bb = busboy({ headers: { 'content-type': event.headers['content-type'] || event.headers['Content-Type'] } });

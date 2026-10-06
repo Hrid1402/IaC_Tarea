@@ -65,7 +65,8 @@ data "aws_iam_policy_document" "crop-lambda" {
     actions = [
       "sqs:ReceiveMessage",
       "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes"
+      "sqs:GetQueueAttributes",
+      "sqs:ChangeMessageVisibility"
     ]
 
     resources = [aws_sqs_queue.main_queue.arn]

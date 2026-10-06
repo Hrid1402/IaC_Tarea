@@ -1,7 +1,7 @@
 # Empaquetar el código de la función de procesamiento Lambda
 data "archive_file" "crop_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/crop.js"
+  source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/lambda/crop_function.zip"
 }
 
@@ -68,4 +68,12 @@ resource "aws_lambda_function" "crop_lambda" {
       aws_security_group.lambda.id
     ]
   }
+}
+
+# Asociar SQS con función Lambda
+resource "aws_lambda_event_source_mapping" "sqs_to_lambda" {
+  event_source_arn        = aws_sqs_queue.main_queue.arn
+  function_name           = aws_lambda_function.crop_lambda.arn
+  batch_size              = 5
+  function_response_types = ["ReportBatchItemFailures"]
 }
